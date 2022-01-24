@@ -65,15 +65,15 @@ srsiInputThresh = input(20, title="Stoch RSI Entry Zone +/-", minval=1)
 // SuperTrends
 // Supertrend slow
 // @ 12, hl2, 3, change = true
-// Supertrend med
-// @ 11, hl2, 2, change = true
-// Supertrend fast
-// @ 10, hl2, 1, change = true
 stInputSrc = input(hl2, title="SuperTrend Source")
 stSlowInputLength = input(12, "Slow SuperTrend Length", minval=1)
 stSlowInputMult = input(3, "Slow SuperTrend Multiplier", minval=1)
+// Supertrend med
+// @ 11, hl2, 2, change = true
 stMedInputLength = input(11, "Med SuperTrend Length", minval=1)
 stMedInputMult = input(2, "Med SuperTrend Multiplier", minval=1)
+// Supertrend fast
+// @ 10, hl2, 1, change = true
 stFastInputLength = input(10, "Fast SuperTrend Length", minval=1)
 stFastInputMult = input(1, "Fast SuperTrend Multiplier", minval=1)
 stInputchangeATR= input(title="Alternate SuperTrend ATR Calculation?", type=input.bool, defval=true)
@@ -111,9 +111,6 @@ stochRSI(smoothK, smoothD, lengthRSI, lengthStoch, src) =>
     d = sma(k, smoothD)
     [k, d]
 
-// ***************************************************
-// Data Calculation
-// ***************************************************
 // SuperTrend Slow
 [stSlowUP, stSlowDN, stSlowTrend, stSlowBuy, stSlowSell, stSlowChanged] = superTrend(stSlowInputLength, stInputSrc, stSlowInputMult, stInputchangeATR)
 
@@ -129,9 +126,8 @@ stochRSI(smoothK, smoothD, lengthRSI, lengthStoch, src) =>
 // EMA
 emaVal = ema(close,EMAInputlength)
 
-// ***************************************************
+
 // Indicator Plots
-// ***************************************************
 // EMA
 plot(emaVal, "K", color=#0094FF)
 
@@ -160,10 +156,8 @@ plotshape(stFastSell ? stFastDN : na, title="Fast DownTrend Begins", location=lo
 // h1 = hline(20, "Lower Band", color=#606060)
 // fill(h0, h1, color=#9915FF, transp=80, title="Background")
 
-// ***************************************************
+
 // Conditional Logic
-// ***************************************************
-// common vars
 float longStop = na
 float longProfit = na
 float shortStop = na
@@ -206,9 +200,8 @@ tempProfitShort = shortCondition ? close - (plInput * shortStopDelta) : shortPro
 shortStop := strategy.position_size >= 0 ? shortCondition ? tempStopShort : na : shortStop[1]
 shortProfit := strategy.position_size >= 0 ? shortCondition ? tempProfitShort : na : shortProfit[1]
 
-// ***************************************************
+
 // Strategy Execution
-// ***************************************************
 strategy.exit("TP/SL", "LongPos", stop=longStop, limit=longProfit) 
 strategy.exit("TP/SL", "ShortPos", stop=shortStop, limit=shortProfit) 
 
@@ -223,9 +216,8 @@ if (shortCondition)
 else
 	strategy.cancel(id="ShortPos")
 
-// ***************************************************
+
 // Strategy Plotting
-// ***************************************************
 // profit/loss target lines
 plot(showPLTargets ? strategy.position_size <= 0 ? na : longStop : na, title="Long Stop Loss", color=color.new(#ff0000, 0), style=plot.style_linebr, linewidth=2)
 plot(showPLTargets ? strategy.position_size <= 0 ? na : longProfit : na, title="Long Profit Target", color=color.new(#00ff00, 0), style=plot.style_linebr, linewidth=2)
@@ -235,9 +227,7 @@ plot(showPLTargets ? strategy.position_size >= 0 ? na : shortProfit : na, title=
 plotshape(showBuySell and longCondition ? true : na, title='Buy Arrow',  location=location.belowbar, color=color.green,   style=shape.arrowup,   text="BUY",  textcolor=color.green, transp=0, size=size.small)
 plotshape(showBuySell and shortCondition ? true : na, title='Sell Arrow', location=location.abovebar, color=color.red,     style=shape.arrowdown, text="SELL", textcolor=color.red,   transp=0, size=size.small)
 
-// ***************************************************
-// Alerts (for use in a study)
-// ***************************************************
+
 alertcondition(longCondition, title="3xST Buy alert", message="Buy")
 alertcondition(shortCondition, title="3xST SELL alert", message="Sell")
 alertcondition(stSlowChanged, title="3xST Slow Trend alert", message="Slow Trend Changed")
